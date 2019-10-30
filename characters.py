@@ -1,29 +1,21 @@
 import pymunk as pm
-from pymunk import Vec2d
+import pygame
+import random
+from pymunk import *
 
 
-class goblin_fly():
-    def __init__(self, distance, angle, x, y, space):
-        self.life = 20
-        mass = 5
-        radius = 12
-        inertia = pm.moment_for_circle(mass, 0, radius, (0, 0))
-        body = pm.Body(mass, inertia)
-        body.position = x, y
-        power = distance * 53
-        impulse = power * Vec2d(1, 0)
-        angle = -angle
-        body.apply_impulse_at_local_point(impulse.rotated(angle))
-        shape = pm.Circle(body, radius, (0, 0))
-        shape.elasticity = 0.95
-        shape.friction = 1
-        shape.collision_type = 0
-        space.add(body, shape)
-        self.body = body
-        self.shape = shape
+class goblin_army:
+	def __init__(self, enemyType, health, speed, money, Map, ID, healthFac, moneyFac):
+		self.speed = float(speed)
+		self.health = int(float(health) * healthFac)
+		#self.image = pygame.image.load(enemyType + '.png')
+		#self.rect = self.image.get_rect()
+		self.x = 40.0
+		self.y = 40.0
+		#self.money = int(float(money) * moneyFac)
+		#self.enemyType = enemyType
 
 
-class goblin_army():
-    def __init__(self, x, y, space):
-        self.life = 20
 
+	def update(self):
+		self.x += (self.speed * 1.25)

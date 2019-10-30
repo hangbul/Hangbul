@@ -3,6 +3,7 @@ import sys
 import math
 import time
 import pygame
+import characters
 current_path = os.getcwd()
 import pymunk as pm
 
@@ -10,11 +11,20 @@ win = pygame.display.set_mode((1028, 600))
 
 pygame.display.set_caption("Fist Game")
 
+#army
+
+#goblins = characters.goblin_army()
+
+
+
+#caterpult
 x = 50
 y = 480
 width = 100
 height = 60
 vel = 5
+
+
 x_mouse = 0
 y_mouse = 0
 mouse_distance = 0
@@ -92,7 +102,7 @@ def sling_action():
         pul = pux, puy
         #screen.blit(redbird, pul)
         pygame.draw.rect(win, (0, 0, 255), (pux, puy, 60, 60))
-
+        #pygame.draw.circle(win,(0,0,255), [pux, puy], 20)
         pu2 = (uv1*bigger_rope+x+60, uv2*bigger_rope+y+40)
         pygame.draw.line(win, (0, 0, 0), (x+60, y + 40), pu2, 5)
         #screen.blit(redbird, pul)
@@ -123,7 +133,7 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
-        if (pygame.mouse.get_pressed()[0] and x_mouse > 100 and x_mouse < 250 and y_mouse > 370 and y_mouse < 550):
+        if (pygame.mouse.get_pressed()[0]):
             mouse_pressed = True
         if (event.type == pygame.MOUSEBUTTONUP and event.button == 1 and mouse_pressed):
             mouse_pressed = False
@@ -138,6 +148,16 @@ while running:
 
     win.fill((255,255,255))
 
+    #menu
+    pygame.draw.rect(win, (153, 93, 0), (0, 0, 1028, 100)) # UI
+
+    for i in range(7):
+        pygame.draw.rect(win, (240, 240, 240), (10 + 90 * i, 10, 80, 80)) #army UI
+
+    for i in range(3):
+        pygame.draw.rect(win, (240, 240, 240), (15 + 90 * 7 + 90 * i, 10, 80, 80)) #pause, start, help menu
+
+    pygame.draw.rect(win, (240, 240, 240), (1028 - 110, 30, 100, 40))  # timer
 
     #ground
     pygame.draw.rect(win, (0, 255, 0), (0, 540, 1028, 60))
@@ -148,8 +168,9 @@ while running:
     if mouse_pressed:
         sling_action()
 
-    #enermy_castle
+    # enermy_castle
     pygame.draw.rect(win, (125, 125, 125), (850, 420, 50, 120))
+    pygame.draw.rect(win, (255, 125, 125), (950, 480, 80, 60))
 
     pygame.display.update()
 
