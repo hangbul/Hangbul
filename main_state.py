@@ -1,48 +1,44 @@
-import random
-import json
 import os
-
-from pico2d import *
-from math import *
-
-import numpy as np
-import pygame
-import game_framework
-import title_state
-import pause_state
-import characters
-import object
-import os
-import cv2
 import sys
+import math
 import time
+import pygame
 current_path = os.getcwd()
+import pymunk as pm
 
-#color
-b_c = (255, 0, 0)
-g_c = (0, 255, 0 )
-r_c = (0, 0, 255)
-w_c = (255, 255, 255)
+win = pygame.display.set_mode((1028, 600))
 
+pygame.display.set_caption("Fist Game")
 
-
-
-name = "MainState"
-
-cater = None
-grass = None
-font = None
-goblin = None
-
-
-rope_draw = False
-mouse_pressed = False
+x = 50
+y = 480
+width = 100
+height = 60
+vel = 5
+x_mouse = 0
+y_mouse = 0
 mouse_distance = 0
-
-x_mouse, y_mouse = None, None
-rope_lenght = 80
+rope_lenght = 90
 angle = 0
 
+#color
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+
+#vecter - gravtity
+space = pm.Space()
+space.gravity = (0.0, -700.0)
+
+
+
+mouse_pressed = False
+running = True
+
+def to_pygame(p):
+    """Convert pymunk to pygame coordinates"""
+    return int(p.x), int(-p.y+600)
 
 
 def vector(p0, p1):
@@ -63,6 +59,7 @@ def unit_vector(v):
     ub = v[1] / h
     return (ua, ub)
 
+
 def distance(xo, yo, x, y):
     """distance between points"""
     dx = x - xo
@@ -71,108 +68,89 @@ def distance(xo, yo, x, y):
     return d
 
 def sling_action():
-
+    """Set up sling behavior"""
     global mouse_distance
     global rope_lenght
     global angle
-    global x_mouse, y_mouse
-    global goblin, cater
-
+    global x_mouse
+    global y_mouse
     # Fixing bird to the sling rope
-    v = vector((cater.sling_x, cater.sling_y), (x_mouse, y_mouse))
+
+    v = vector((x + 50, y+40), (x_mouse, y_mouse))
     uv = unit_vector(v)
     uv1 = uv[0]
     uv2 = uv[1]
-    mouse_distance = distance(cater.sling_x, cater.sling_y, x_mouse, y_mouse)
-    pu = (uv1*rope_lenght+cater.sling_x, uv2*rope_lenght+cater.sling_y)
+    mouse_distance = distance(x+ 50, y+40, x_mouse, y_mouse)
+    pu = (uv1*rope_lenght+x+50, uv2*rope_lenght+y+40)
     bigger_rope = 102
-    x_goblin = x_mouse - 20
-    y_goblin = y_mouse - 20
+    x_redbird = x_mouse - 20
+    y_redbird = y_mouse - 20
     if mouse_distance > rope_lenght:
         pux, puy = pu
         pux -= 20
         puy -= 20
-        goblin.x, goblin.y= pux, puy
-        goblin.draw()
-        pu2 = (uv1*bigger_rope+cater.sling_x, uv2*bigger_rope+cater.sling_y)
-        goblin.x, goblin.y= pux, puy
+        pul = pux, puy
+        #screen.blit(redbird, pul)
+        pygame.draw.rect(win, (0, 0, 255), (pux, puy, 60, 60))
+
+        pu2 = (uv1*bigger_rope+x+60, uv2*bigger_rope+y+40)
+        pygame.draw.line(win, (0, 0, 0), (x+60, y + 40), pu2, 5)
+        #screen.blit(redbird, pul)
+        pygame.draw.rect(win, (0, 0, 255), (pux, puy, 60, 60))
+
+        pygame.draw.line(win, (0, 0, 0), (x+ 50, y+40), pu2, 5)
     else:
         mouse_distance += 10
-        pu3 = (uv1*mouse_distance+cater.sling_x, uv2*mouse_distance+cater.sling_y)
-        goblin.x, goblin.y = x_goblin, y_goblin
-        goblin.draw()
+        pu3 = (uv1*mouse_distance+x+50, uv2*mouse_distance+y+40)
+        pygame.draw.line(win, (0, 0, 0), (x+60, y+40), pu3, 5)
+        #screen.blit(redbird, (x_redbird, y_redbird))
+        pygame.draw.rect(win, (0, 0, 255), (x_redbird, y_redbird, 60, 60))
 
+        pygame.draw.line(win, (0, 0, 0), (x+50, y+40), pu3, 5)
     # Angle of impulse
-    dy = y_mouse - cater.sling_y
-    dx = x_mouse - cater.sling_x
+    dy = y_mouse - y - 40
+    dx = x_mouse - x - 50
     if dx == 0:
         dx = 0.00000000000001
     angle = math.atan((float(dy))/dx)
 
 
-def enter():
-    global  grass, goblin, cater
-    goblin = characters.Goblin()
-    grass = object.Grass()
-    cater = object.catetpult()
+while running:
+    pygame.time.delay(100)
 
-
-def exit():
-    global goblin, grass, cater
-    del(goblin)
-    del(grass)
-    del(cater)
-
-def pause():
-    pass
-
-
-def resume():
-    pass
-
-
-def handle_events():
-    global gob_draw, mouse_pressed, x_mouse, y_mouse, rope_draw
-
-    events = get_events()
-    for event in events:
-        if event.type == SDL_QUIT:
-            game_framework.quit()
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            game_framework.change_state(title_state)
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_p:
-            game_framework.push_state(pause_state)
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_LEFT:
-            cater.dir = -1
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
-            cater.dir = 1
-        elif event.type == SDL_KEYUP and (event.key == SDLK_RIGHT or event.key == SDLK_LEFT):
-            cater.dir = 0
-        elif event.type == SDL_MOUSEBUTTONDOWN:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            running = False
+        if (pygame.mouse.get_pressed()[0] and x_mouse > 100 and x_mouse < 250 and y_mouse > 370 and y_mouse < 550):
             mouse_pressed = True
-            rope_draw =True
-        elif event.type == SDL_MOUSEBUTTONUP:
+        if (event.type == pygame.MOUSEBUTTONUP and event.button == 1 and mouse_pressed):
             mouse_pressed = False
-            rope_draw = False
-        elif event.type == SDL_MOUSEMOTION:
-            x_mouse, y_mouse = event.x, 600 - event.y + 1
+    keys = pygame.key.get_pressed()
+
+    x_mouse, y_mouse = pygame.mouse.get_pos()
+
+    if keys[pygame.K_LEFT]:
+        x -= vel
+    if keys[pygame.K_RIGHT]:
+        x += vel
+
+    win.fill((255,255,255))
 
 
-def update():
-    #boy.update()
-    pass
+    #ground
+    pygame.draw.rect(win, (0, 255, 0), (0, 540, 1028, 60))
 
-def draw():
-    clear_canvas()
-
+    #caterpult
+    pygame.draw.rect(win, (255, 0, 0), (x, y, width, height))
+    #sling
     if mouse_pressed:
         sling_action()
 
-    grass.draw()
-    cater.draw()
-    update_canvas()
+    #enermy_castle
+    pygame.draw.rect(win, (125, 125, 125), (850, 420, 50, 120))
 
+    pygame.display.update()
 
-
-
-
+pygame.quit()
