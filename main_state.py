@@ -161,8 +161,11 @@ while running:
         if (event.type == pygame.MOUSEBUTTONUP and event.button == 1 and mouse_pressed):
             mouse_pressed = False
 
-            xo = 154
-            yo = 156
+            #cat_x = 50
+            #cat_y = 480
+
+            xo = cat_x + 105
+            yo = 100
             if mouse_distance > rope_lenght:
                 mouse_distance = rope_lenght
 
@@ -210,6 +213,8 @@ while running:
     #sling
     if mouse_pressed and y_mouse > 100:
         sling_action()
+        fly_path = []
+
     diver_to_removed=[]
     #fly_diver
     for diver in divers:
