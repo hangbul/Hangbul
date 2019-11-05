@@ -7,6 +7,8 @@ from Minions import Goblin
 from Minions import Enemy
 from object import Enemy_castle
 from object import Doom_diver
+from object import Goblin_Doom_Catulpult
+
 current_path = os.getcwd()
 import pymunk as pm
 
@@ -22,18 +24,15 @@ game_run_time = 0
 spawn_count = 0
 goblins = []
 divers = []
+catulpult = Goblin_Doom_Catulpult()
+
 
 #enemy
 E_spawn_count = 0
 enemys = []
 castle = Enemy_castle()
 
-#caterpult
-cat_x = 50
-cat_y = 480
-width = 100
-height = 60
-vel = 5
+
 
 fly_path=[]
 
@@ -106,12 +105,12 @@ def sling_action():
     global y_mouse
     # Fixing bird to the sling rope
 
-    v = vector((cat_x + 50, cat_y+40), (x_mouse, y_mouse))
+    v = vector((catulpult.x + 50, catulpult.y+40), (x_mouse, y_mouse))
     uv = unit_vector(v)
     uv1 = uv[0]
     uv2 = uv[1]
-    mouse_distance = distance(cat_x + 50, cat_y + 40, x_mouse, y_mouse)
-    pu = (uv1*rope_lenght+cat_x+50, uv2*rope_lenght+cat_y+40)
+    mouse_distance = distance(catulpult.x + 50, catulpult.y + 40, x_mouse, y_mouse)
+    pu = (uv1*rope_lenght+catulpult.x+50, uv2*rope_lenght+catulpult.y+40)
     bigger_rope = 102
     x_diver = x_mouse - 20
     y_diver = y_mouse - 20
@@ -123,30 +122,30 @@ def sling_action():
         #loaded shell
         pygame.draw.rect(win, (0, 0, 255), (pux, puy, 60, 60))
         #
-        pu2 = (uv1*bigger_rope + cat_x + 60, uv2*bigger_rope + cat_y+40)
-        pygame.draw.line(win, (0, 0, 0), (cat_x+70, cat_y + 20), pu2, 5)
+        pu2 = (uv1*bigger_rope + catulpult.x + 60, uv2*bigger_rope + catulpult.y+40)
+        pygame.draw.line(win, (0, 0, 0), (catulpult.x+70, catulpult.y + 20), pu2, 5)
         pygame.draw.rect(win, (0, 0, 255), (pux, puy, 30, 30))
         #pygame.draw.circle(win, BLUE, (pux, puy), 12, 2)
-        pygame.draw.line(win, (0, 0, 0), (cat_x+ 60, cat_y+20), pu2, 5)
+        pygame.draw.line(win, (0, 0, 0), (catulpult.x+ 60, catulpult.y+20), pu2, 5)
     else:
         mouse_distance += 10
-        pu3 = (uv1*mouse_distance + cat_x + 50, uv2*mouse_distance + cat_y +40)
-        pygame.draw.line(win, (0, 0, 0), (cat_x+70, cat_y+20), pu3, 5)
+        pu3 = (uv1*mouse_distance + catulpult.x + 50, uv2*mouse_distance + catulpult.y +40)
+        pygame.draw.line(win, (0, 0, 0), (catulpult.x+70, catulpult.y+20), pu3, 5)
         #screen.blit(redbird, (x_redbird, y_redbird))
         pygame.draw.rect(win, (0, 0, 255), (x_diver, y_diver, 30, 30))
         #pygame.draw.circle(win, BLUE, (x_diver, y_diver), 12, 2)
-        pygame.draw.line(win, (0, 0, 0), (cat_x+60, cat_y+20), pu3, 5)
+        pygame.draw.line(win, (0, 0, 0), (catulpult.x+60, catulpult.y+20), pu3, 5)
 
     # Angle of impulse
-    dy = y_mouse - cat_y - 40
-    dx = x_mouse - cat_x - 50
+    dy = y_mouse - catulpult.y - 40
+    dx = x_mouse - catulpult.x - 50
     if dx == 0:
         dx = 0.00000000000001
     angle = math.atan((float(dy))/dx)
 
 
 while running:
-    pygame.time.delay(100)
+    pygame.time.delay(50)
     money += 1
     game_run_time += 1
 
@@ -164,12 +163,12 @@ while running:
             #cat_x = 50
             #cat_y = 480
 
-            xo = cat_x + 105
+            xo = catulpult.x + 105
             yo = 100
             if mouse_distance > rope_lenght:
                 mouse_distance = rope_lenght
 
-            if x_mouse < cat_x + 5:
+            if x_mouse < catulpult.x + 5:
                 diver = Doom_diver(mouse_distance, angle, xo, yo, space)
                 divers.append(diver)
             else:
@@ -181,9 +180,9 @@ while running:
     x_mouse, y_mouse = pygame.mouse.get_pos()
 
     if keys[pygame.K_LEFT]:
-        cat_x -= vel
+        catulpult.x -= catulpult.dir
     if keys[pygame.K_RIGHT]:
-        cat_x += vel
+        catulpult.x += catulpult.dir
 
     win.fill((230,230,255))
 
@@ -204,7 +203,7 @@ while running:
     pygame.draw.rect(win, (0, 255, 0), (0, 540, 1028, 60))
 
     #caterpult
-    pygame.draw.rect(win, (255, 0, 0), (cat_x, cat_y, width, height))
+    pygame.draw.rect(win, (255, 0, 0), (catulpult.x, catulpult.y, catulpult.width, catulpult.height))
 
 
     for point in fly_path:
@@ -234,7 +233,7 @@ while running:
 
     #spawn army
     if mouse_pressed and x_mouse > 10 and x_mouse < 90 and y_mouse > 10 and y_mouse < 90:
-        if money > 50:
+        if money > 10:
             goblins.append(Goblin(spawn_count))
             spawn_count += 1
             money -= 50
@@ -261,7 +260,8 @@ while running:
         win.blit(number_font, (930, 150))
 
     for goblin in goblins:
-        pygame.draw.rect(win, (255, 255, 0), (goblin.x, goblin.y , 20, 40))
+        #pygame.draw.rect(win, (255, 255, 0), (goblin.x, goblin.y , 20, 40))
+        win.blit(goblin.image, (goblin.x, goblin.y))
         goblin.update()
 
     for enemy in enemys:
