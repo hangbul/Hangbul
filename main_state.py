@@ -7,7 +7,7 @@ from Minions import Goblin
 from Minions import Enemy
 from object import Enemy_castle
 from object import Doom_diver
-from object import Goblin_Doom_Catulpult
+from object import Goblin_Doom_catulpult
 
 current_path = os.getcwd()
 import pymunk as pm
@@ -24,7 +24,7 @@ game_run_time = 0
 spawn_count = 0
 goblins = []
 divers = []
-catulpult = Goblin_Doom_Catulpult()
+catulpult = Goblin_Doom_catulpult()
 
 
 #enemy
@@ -120,13 +120,13 @@ def sling_action():
         puy -= 20
         pul = pux, puy
         #loaded shell
-        pygame.draw.rect(win, (0, 0, 255), (pux, puy, 60, 60))
+        pygame.draw.rect(win, (0, 0, 255), (pux, puy, 30, 30))
         #
         pu2 = (uv1*bigger_rope + catulpult.x + 60, uv2*bigger_rope + catulpult.y+40)
-        pygame.draw.line(win, (0, 0, 0), (catulpult.x+70, catulpult.y + 20), pu2, 5)
+        pygame.draw.line(win, (0, 0, 0), (catulpult.x + 70, catulpult.y + 20), pu2, 5)
         pygame.draw.rect(win, (0, 0, 255), (pux, puy, 30, 30))
         #pygame.draw.circle(win, BLUE, (pux, puy), 12, 2)
-        pygame.draw.line(win, (0, 0, 0), (catulpult.x+ 60, catulpult.y+20), pu2, 5)
+        pygame.draw.line(win, (0, 0, 0), (catulpult.x + 70, catulpult.y+20), pu2, 5)
     else:
         mouse_distance += 10
         pu3 = (uv1*mouse_distance + catulpult.x + 50, uv2*mouse_distance + catulpult.y +40)
@@ -134,7 +134,7 @@ def sling_action():
         #screen.blit(redbird, (x_redbird, y_redbird))
         pygame.draw.rect(win, (0, 0, 255), (x_diver, y_diver, 30, 30))
         #pygame.draw.circle(win, BLUE, (x_diver, y_diver), 12, 2)
-        pygame.draw.line(win, (0, 0, 0), (catulpult.x+60, catulpult.y+20), pu3, 5)
+        pygame.draw.line(win, (0, 0, 0), (catulpult.x+80, catulpult.y+20), pu3, 5)
 
     # Angle of impulse
     dy = y_mouse - catulpult.y - 40
@@ -180,9 +180,9 @@ while running:
     x_mouse, y_mouse = pygame.mouse.get_pos()
 
     if keys[pygame.K_LEFT]:
-        catulpult.x -= catulpult.dir
+        catulpult.update(-1)
     if keys[pygame.K_RIGHT]:
-        catulpult.x += catulpult.dir
+        catulpult.update(1)
 
     win.fill((230,230,255))
 
@@ -198,13 +198,11 @@ while running:
     pygame.draw.rect(win, (240, 240, 240), (1028 - 110, 30, 100, 40))  # timer
 
 
-
     #ground
     pygame.draw.rect(win, (0, 255, 0), (0, 540, 1028, 60))
 
     #caterpult
-    pygame.draw.rect(win, (255, 0, 0), (catulpult.x, catulpult.y, catulpult.width, catulpult.height))
-
+    win.blit(catulpult.image, (catulpult.x, catulpult.y))
 
     for point in fly_path:
         pygame.draw.circle(win, WHITE, point, 5, 0)
