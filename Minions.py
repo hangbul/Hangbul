@@ -59,12 +59,12 @@ class IdleState:
 
     @staticmethod
     def draw(minion):
-        minion.font.draw(-30 - minion.window_left + minion.x, 50 - minion.window_bottom + minion.y,
-                         'HP: %d' % minion.Health_point,
-                         (255, 255, 0))
+
+        minion.HPimage0.draw(0 - minion.window_left + minion.x, 50 + minion.y)
+        minion.HPimage1.clip_draw(0, 0, (int)(90 *(minion.Health_point/minion.Max_HP)), 20, -(int)(90 *(1-(minion.Health_point/minion.Max_HP)))//2 - minion.window_left + minion.x, 50 + minion.y)
 
         minion.image.clip_draw(int(minion.frame) * minion.w, 0, minion.w, minion.h, 0 - minion.window_left + minion.x,
-                               0 - minion.window_bottom + minion.y)
+                               0 + minion.y)
 
 
 class AttackState:
@@ -100,12 +100,12 @@ class AttackState:
 
     @staticmethod
     def draw(minion):
-        minion.font.draw(-30 - minion.window_left + minion.x, 50 - minion.window_bottom + minion.y,
-                         'HP: %d' % minion.Health_point,
-                         (255, 255, 0))
 
+        minion.HPimage0.draw(0 - minion.window_left + minion.x, 50 + minion.y)
+        minion.HPimage1.clip_draw(0, 0, (int)(90 * (minion.Health_point / minion.Max_HP)), 20, -(int)(
+            90 * (1 - (minion.Health_point / minion.Max_HP))) // 2 - minion.window_left + minion.x, 50 + minion.y)
         minion.image.clip_draw(int(minion.frame) * minion.w, 0, minion.w, minion.h, 0 - minion.window_left + minion.x,
-                               0 - minion.window_bottom + minion.y)
+                               0 + minion.y)
 
 
 next_state_table = {
@@ -115,17 +115,22 @@ next_state_table = {
 
 
 class Goblin_Knight:
+    image = None
 
     def __init__(self):
+        self.HPimage0 = load_image('resources/images/UI/HP_0.png')
+        self.HPimage1 = load_image('resources/images/UI/HP_1.png')
+
         self.type = GOBLIN_KNGIHT
-        self.DF = 8
-        self.AP = 8
-        self.Health_point = 100
+        self.DF = 80
+        self.AP = 80
+        self.Max_HP = 1000
+        self.Health_point = self.Max_HP
         self.x, self.y = - 20, 90
         self.window_left = 0
         self.window_bottom = 0
-        # Boy is only once created, so instance image loading is fine
-        self.image = load_image('resources/images/Goblins/GK_walk.png')
+        if Goblin_Knight.image == None:
+            Goblin_Knight.image = load_image('resources/images/Goblins/GK_walk.png')
         self.font = load_font('ENCR10B.TTF', 16)
         self.dir = 1
         self.velocity = 0
@@ -192,17 +197,22 @@ class Goblin_Knight:
 
 
 class Goblin_Spear:
+    image = None
 
     def __init__(self):
+        self.HPimage0 = load_image('resources/images/UI/HP_0.png')
+        self.HPimage1 = load_image('resources/images/UI/HP_1.png')
         self.type = GOBLIN_SPEAR
         self.DF = 15
         self.AP = 5
-        self.Health_point = 100
+        self.Max_HP = 90
+        self.Health_point = self.Max_HP
         self.x, self.y = - 20, 90
         self.window_left = 0
         self.window_bottom = 0
         # Boy is only once created, so instance image loading is fine
-        self.image = load_image('resources/images/Goblins/GS_walk.png')
+        if Goblin_Spear.image == None:
+            Goblin_Spear.image = load_image('resources/images/Goblins/GS_walk.png')
         self.font = load_font('ENCR10B.TTF', 16)
         self.dir = 1
         self.velocity = 0
@@ -262,7 +272,7 @@ class Goblin_Spear:
     def draw(self):
         self.cur_state.draw(self)
         # debug
-        draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_bb())
 
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:
@@ -271,17 +281,23 @@ class Goblin_Spear:
 
 
 class Goblin_Babarian:
+    image = None
 
     def __init__(self):
+        self.HPimage0 = load_image('resources/images/UI/HP_0.png')
+        self.HPimage1 = load_image('resources/images/UI/HP_1.png')
+
         self.type = GOBLIN_BABARIAN
-        self.DF = 3
-        self.AP = 15
-        self.Health_point = 100
+        self.DF = 30
+        self.AP = 150
+        self.Max_HP = 1300
+        self.Health_point = self.Max_HP
         self.x, self.y = - 20, 90
         self.window_left = 0
         self.window_bottom = 0
         # Boy is only once created, so instance image loading is fine
-        self.image = load_image('resources/images/Goblins/GB_walk.png')
+        if Goblin_Babarian.image == None:
+            Goblin_Babarian.image = load_image('resources/images/Goblins/GB_walk.png')
         self.font = load_font('ENCR10B.TTF', 16)
         self.dir = 1
         self.velocity = 0
@@ -349,18 +365,24 @@ class Goblin_Babarian:
 
 
 class Dwarf_worrior:
+    image = None
 
     def __init__(self):
+        self.HPimage0 = load_image('resources/images/UI/HP_0.png')
+        self.HPimage1 = load_image('resources/images/UI/HP_1.png')
+
         self.type = DWARF_BABARIAN
-        self.DF = 5
-        self.AP = 10
-        self.Health_point = 100
+        self.DF = 50
+        self.AP = 100
+        self.Max_HP = 1500
+        self.Health_point = self.Max_HP
         self.x, self.y = 1500, 90
         self.window_left = 0
         self.window_bottom = 0
         # Boy is only once created, so instance image loading is fine
         # self.image = load_image('resources/images/Gk_walk/GK_walk.png')
-        self.image = load_image('resources/images/Dwarfs/DW_walk.png')
+        if Dwarf_worrior == None:
+            Dwarf_worrior.image = load_image('resources/images/Dwarfs/DW_walk.png')
         self.font = load_font('ENCR10B.TTF', 16)
         self.dir = -1
         self.velocity = 0
@@ -425,18 +447,24 @@ class Dwarf_worrior:
             self.add_event(key_event)
 
 class Dwarf_babarian:
+    image = None
 
     def __init__(self):
+        self.HPimage0 = load_image('resources/images/UI/HP_0.png')
+        self.HPimage1 = load_image('resources/images/UI/HP_1.png')
+
         self.type = DWARF_WORRIR
-        self.DF = 1
-        self.AP = 15
-        self.Health_point = 100
+        self.DF = 10
+        self.AP = 150
+        self.Max_HP = 1600
+        self.Health_point = self.Max_HP
         self.x, self.y = 1500, 90
         self.window_left = 0
         self.window_bottom = 0
         # Boy is only once created, so instance image loading is fine
         # self.image = load_image('resources/images/Gk_walk/GK_walk.png')
-        self.image = load_image('resources/images/Dwarfs/DB_walk.png')
+        if Dwarf_babarian.image == None:
+            Dwarf_babarian.image = load_image('resources/images/Dwarfs/DB_walk.png')
         self.font = load_font('ENCR10B.TTF', 16)
         self.dir = -1
         self.velocity = 0

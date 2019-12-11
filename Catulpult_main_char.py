@@ -2,19 +2,16 @@ import game_framework
 from pico2d import *
 import game_world
 
-# Boy Run Speed
 PIXEL_PER_METER = (5.0 / 0.3)  # 10 pixel 30 cm
 RUN_SPEED_KMPH = 20.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-# Boy Action Speed
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 60
 
-# Boy Event
 RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP = range(4)
 
 key_event_table = {
@@ -25,7 +22,6 @@ key_event_table = {
 }
 
 
-# Boy States
 
 class IdleState:
 
@@ -50,7 +46,6 @@ class IdleState:
 
     @staticmethod
     def draw(Goblin_Doom_catulpult):
-        #cx = Goblin_Doom_catulpult.canvas_width // 2 - 20
         cx = Goblin_Doom_catulpult.x - Goblin_Doom_catulpult.bg.window_left
         Goblin_Doom_catulpult.image.clip_draw(int(Goblin_Doom_catulpult.frame) * Goblin_Doom_catulpult.w, 0, Goblin_Doom_catulpult.w, Goblin_Doom_catulpult.h, cx,Goblin_Doom_catulpult.y)
 
@@ -97,12 +92,15 @@ next_state_table = {
 class Goblin_Doom_catulpult:
 
     def __init__(self):
-        self.Health_point = 1000
-        self.x, self.y = 100, 120
+        self.HPimage0 = load_image('resources/images/UI/GDC_HP_0.png')
+        self.HPimage1 = load_image('resources/images/UI/GDC_HP_1.png')
+        self.Max_HP = 3000
+        self.Health_point = self.Max_HP
+        self.x, self.y = 100, 100
+        self.AP = 400
         self.canvas_width = get_canvas_width()
         self.canvas_height = get_canvas_height()
-        # Boy is only once created, so instance image loading is fine
-        self.image = load_image("resources/images/Goblins/goblin_doom_diver_caterpult_animation_sheet.png")
+        self.image = load_image("resources/images/Goblins/Goblin_Doom_wheel.png")
         self.font = load_font('ENCR10B.TTF', 16)
         self.w = self.image.w // 60
         self.h = self.image.h // 2
@@ -134,12 +132,13 @@ class Goblin_Doom_catulpult:
 
     def draw(self):
         self.cur_state.draw(self)
-        self.font.draw(10 + self.x - self.bg.window_left - self.w//2, 140 + self.y - self.h//2,
-                         'HP: %d' % self.Health_point,
-                         (255, 255, 0))
 
-        # debug
-        draw_rectangle(*self.get_bb())
+        self.HPimage0.draw(self.canvas_width//2,  140 + self.y - self.h // 2)
+        self.HPimage1.clip_draw(0, 0, (int)(257 *(self.Health_point/self.Max_HP)), 20, -(int)(257 *(1-(self.Health_point/self.Max_HP)))//2 + self.canvas_width//2,  140 + self.y - self.h // 2)
+
+        self.font.draw(self.canvas_width//2 - 100, 160 + self.y - self.h // 2,
+                   'HP: %d' % self.Health_point,
+                   (255, 255, 0))
 
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:

@@ -6,7 +6,7 @@ import math
 from pico2d import *
 import game_framework
 import game_world
-
+import pause_state
 import title_state
 
 
@@ -18,6 +18,7 @@ from Backgorund_objacts import Castle
 from UI_s import Goblin_knight_UI
 from UI_s import Goblin_spear_UI
 from UI_s import Goblin_babarian_UI
+from UI_s import UI_Case
 from UI_s import Mouse_UI
 
 from Minions import Goblin_Knight
@@ -38,15 +39,19 @@ background = None
 ground = None
 
 #UI
+GOBLIN_KNGIHT, GOBLIN_SPEAR, GOBLIN_BABARIAN = range(3)
 UIs = []
+temp = 0
+UIC = None
 mouse = None
-
+mouse_coll = False
+UI_count = 0
 game_run_time = 0
+count = 0
 
 # army
 spawn_count = 0
 goblins = []
-divers = []
 catulpult = None
 
 # enemy
@@ -54,109 +59,15 @@ E_spawn_count = 0
 enemys = []
 castle = None
 
-fly_path = []
+
 
 # ====================================================
 
 scr_w = 800
 scr_h = 600
 
-sling_p = None
-
-mouse_distance = 0
-rope_lenght = 90
-angle = 0
-money = 0
-
-# color
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-
-
 mouse_pressed = False
-running = True
-Flying = False
 
-def vector(p0, p1):
-    a = p1[0] - p0[0]
-    b = p1[1] - p0[1]
-    return (a, b)
-
-
-def unit_vector(v):
-    h = ((v[0] ** 2) + (v[1] ** 2)) ** 0.5
-    if h == 0:
-        h = 0.000000000000001
-    ua = v[0] / h
-    ub = v[1] / h
-    return (ua, ub)
-
-
-def distance(xo, yo, x, y):
-    dx = x - xo
-    dy = y - yo
-    d = ((dx ** 2) + (dy ** 2)) ** 0.5
-    return d
-
-
-def sling_action():
-    """Set up sling behavior"""
-    global mouse_distance
-    global rope_lenght
-    global angle
-    global sling_p
-    sling_p = (scr_w//2 + catulpult.w/2 - 10, catulpult.h - 10)
-
-    # Fixing bird to the sling rope
-
-    v = vector((sling_p.x + 50, sling_p.y + 40), (mouse.x, mouse.y))
-    uv = unit_vector(v)
-    uv1 = uv[0]
-    uv2 = uv[1]
-    mouse_distance = distance(sling_p.x + 50, sling_p.y + 40, mouse.x, mouse.y)
-    pu = (uv1 * rope_lenght + sling_p.x + 50, uv2 * rope_lenght + sling_p.y + 40)
-    bigger_rope = 120
-    x_diver = mouse.y - 20
-    y_diver = mouse.y - 20
-    if mouse_distance > rope_lenght:
-        pux, puy = pu
-        pux -= 20
-        puy -= 20
-        pul = pux, puy
-        # loaded shell
-        #pygame.draw.rect(win, (0, 0, 255), (pux, puy, 30, 30))
-        draw_rectangle((pux, puy, 30, 30))
-        #
-        pu2 = (uv1 * bigger_rope + sling_p.x + 60, uv2 * bigger_rope + sling_p.y + 40)
-
-        #pygame.draw.line(win, (0, 0, 0), (catulpult.x + 70, catulpult.y + 20), pu2, 5)
-        #pygame.draw.rect(win, (0, 0, 255), (pux, puy, 30, 30))
-        #draw_line
-        draw_rectangle((pux, puy, pux + 30, puy + 30))
-
-        # pygame.draw.circle(win, BLUE, (pux, puy), 12, 2)
-        #pygame.draw.line(win, (0, 0, 0), (catulpult.x + 70, catulpult.y + 20), pu2, 5)
-        #draw_line
-    else:
-        mouse_distance += 10
-        pu3 = (uv1 * mouse_distance + sling_p.x + 50, uv2 * mouse_distance + sling_p.y + 40)
-        #pygame.draw.line(win, (0, 0, 0), (catulpult.x + 70, catulpult.y + 20), pu3, 5)
-        # draw_line
-        # screen.blit(redbird, (x_redbird, y_redbird))
-        #pygame.draw.rect(win, (0, 0, 255), (x_diver, y_diver, 30, 30))
-        # draw_line
-        # pygame.draw.circle(win, BLUE, (x_diver, y_diver), 12, 2)
-        #pygame.draw.line(win, (0, 0, 0), (catulpult.x + 80, catulpult.y + 20), pu3, 5)
-        # draw_line
-
-    # Angle of impulse
-    dy = mouse.y - sling_p.y - 40
-    dx = mouse.x - sling_p.x - 50
-    if dx == 0:
-        dx = 0.00000000000001
-    angle = math.atan((float(dy)) / dx)
 
 
 # ====================================================
@@ -201,12 +112,9 @@ def enter():
     game_world.add_object(frontground, 2)
     frontground.set_center_object(catulpult)
 
-    global UIs
-    UIs = [Goblin_knight_UI(), Goblin_spear_UI(), Goblin_babarian_UI()]
-    for UI in UIs:
-        game_world.add_object(UI, 2)
-
-
+    global UIC
+    UIC = UI_Case()
+    game_world.add_object(UIC, 2)
 
     global mouse
     mouse = Mouse_UI()
@@ -224,54 +132,24 @@ def resume():
 
 
 def handle_events():
-
     events = get_events()
-    global mouse_pressed
-    global mouse_distance
-    global spawn_count
+    global mouse_pressed, mouse_distance
 
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_state(title_state)
-        elif event.type == SDL_KEYUP and event.key == SDLK_1:
-            goblins.append(Goblin_Knight())
-            game_world.add_object(goblins[spawn_count], 1)
-            goblins[spawn_count].set_center_object(catulpult)
-            spawn_count += 1
-        elif event.type == SDL_KEYUP and event.key == SDLK_2:
-            goblins.append(Goblin_Spear())
-            game_world.add_object(goblins[spawn_count], 1)
-            goblins[spawn_count].set_center_object(catulpult)
-            spawn_count += 1
-        elif event.type == SDL_KEYUP and event.key == SDLK_3:
-            goblins.append(Goblin_Babarian())
-            game_world.add_object(goblins[spawn_count], 1)
-            goblins[spawn_count].set_center_object(catulpult)
-            spawn_count += 1
 
-        elif event.type == SDL_MOUSEBUTTONDOWN and event.key == SDLK_LEFT:
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_p:
+            game_framework.push_state(pause_state)
+
+        elif event.type == SDL_MOUSEBUTTONDOWN:
             mouse_pressed = True
-        elif event.type == SDL_MOUSEBUTTONUP and mouse_pressed:
+
+        elif event.type == SDL_MOUSEBUTTONUP:
             mouse_pressed = False
 
-            # cat_x = 50
-            # cat_y = 480
-
-            xo = catulpult.x + 105
-            yo = 100
-            if mouse_distance > rope_lenght:
-                mouse_distance = rope_lenght
-
-            if mouse.x < catulpult.x + 5:
-                #diver = Doom_diver(mouse_distance, angle, xo, yo, space)
-                #divers.append(diver)
-                pass
-            else:
-                #diver = Doom_diver(-mouse_distance, angle, xo, yo, space)
-                #divers.append(diver)
-                pass
         elif event.type == SDL_MOUSEMOTION:
             mouse.x = event.x
             mouse.y = 600 - event.y +1
@@ -280,18 +158,28 @@ def handle_events():
 
 
 def update():
-    global game_run_time, E_spawn_count
+    global game_run_time, E_spawn_count, spawn_count, UI_count, mouse_coll, mouse_pressed, goblins
     game_run_time += 1
 
-    if game_run_time % 500 == 0:
+    if game_run_time % 700 == 0:
         if random.randint(0, 100) <= 50:
             enemys.append(Dwarf_worrior())
-            game_world.add_object(enemys[E_spawn_count], 1)
         else:
             enemys.append(Dwarf_babarian())
-            game_world.add_object(enemys[E_spawn_count], 1)
+        game_world.add_object(enemys[E_spawn_count], 1)
         enemys[E_spawn_count].set_center_object(catulpult)
         E_spawn_count += 1
+
+    if game_run_time % 300 == 0:
+        if UI_count < 6:
+            if random.randint(0, 100) <= 50:
+                UIs.append(Goblin_spear_UI())
+            elif 50 < random.randint(0, 100) <= 75:
+                UIs.append(Goblin_knight_UI())
+            else:
+                UIs.append(Goblin_babarian_UI())
+            game_world.add_object(UIs[UI_count], 2)
+            UI_count += 1
 
     for game_object in game_world.all_objects():
         game_object.update()
@@ -301,7 +189,7 @@ def update():
             if collide(goblin, enemy):
                 enemy.attack()
                 goblin.attack()
-                if 15< enemy.frame <=15.5:
+                if 12< enemy.frame <=12.5:
                     goblin.Health_point -= clamp(1,enemy.AP - goblin.DF,enemy.AP)
                 if 15< goblin.frame <= 15.5:
                     enemy.Health_point -= clamp(1,goblin.AP - enemy.DF,goblin.AP)
@@ -315,10 +203,60 @@ def update():
                         goblin.dead()
                         enemy_q.kill()
                         game_world.remove_object(goblin)
+        if collide(goblin, castle):
+            goblin.attack()
+            if 15 < goblin.frame <= 15.5:
+                castle.Health_Point -= goblin.AP
+
+    if collide(catulpult, castle):
+        catulpult.x -= 5
+
     for enemy in enemys:
         if collide(catulpult, enemy):
-            print("Crash")
-            #game_framework.change_state(title_state)
+
+            if catulpult.x_velocity != 0 and game_run_time % 20 == 0:
+                enemy.Health_point -= catulpult.AP
+                catulpult.Health_point -= enemy.AP
+            enemy.x += 2
+
+            if enemy.Health_point <= 0:
+                game_world.remove_object(enemy)
+            if catulpult.Health_point <= 0:
+                # game_framework.change_state(game_over_state)
+                pass
+
+    for UIa in UIs:
+        for UIb in UIs:
+            if UIa != UIb and collide(UIa, UIb):
+                UIb.dir = 0
+                UIb.x -=2
+        if collide(UIa, mouse):
+            if mouse_pressed==True:
+                if UIa.type == GOBLIN_KNGIHT:
+                    goblins.append(Goblin_Knight())
+                    game_world.add_object(goblins[spawn_count], 1)
+                    goblins[spawn_count].set_center_object(catulpult)
+                elif UIa.type == GOBLIN_SPEAR:
+                    goblins.append(Goblin_Spear())
+                    game_world.add_object(goblins[spawn_count], 1)
+                    goblins[spawn_count].set_center_object(catulpult)
+                elif UIa.type == GOBLIN_BABARIAN:
+                    goblins.append(Goblin_Babarian())
+                    game_world.add_object(goblins[spawn_count], 1)
+                    goblins[spawn_count].set_center_object(catulpult)
+                spawn_count += 1
+                UIs.remove(UIa)
+                game_world.remove_object(UIa)
+                for UIb in UIs:
+                    UIb.dir = 1
+                UI_count -= 1
+
+
+    for UIa in UIs:
+        if collide(UIa, UIC):
+            UIa.dir = 0
+
+
 
     delay(0.01)
 
