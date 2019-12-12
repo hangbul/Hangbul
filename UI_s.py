@@ -26,12 +26,17 @@ class Goblin_knight_UI:
         self.x = start
         self.y = 540
         self.dir = 1
+        self.spone_sound = load_wav('resources/sound/kngiht_gob_spone.wav')
+        self.spone_sound.set_volume(64)
 
     def update(self):
         self.x += self.dir
 
     def draw(self):
         self.image.draw(self.x, self.y)
+
+    def sound(self):
+        self.spone_sound.play()
 
     def get_bb(self):
         return self.x - 40, self.y - 40 , self.x + 40 - 1, self.y + 40 -1
@@ -43,6 +48,8 @@ class Goblin_spear_UI:
         self.x = start
         self.y = 540
         self.dir = 1
+        self.spone_sound = load_wav('resources/sound/spear_gob_spone.wav')
+        self.spone_sound.set_volume(64)
 
     def update(self):
         self.x += self.dir
@@ -52,6 +59,9 @@ class Goblin_spear_UI:
 
     def get_bb(self):
         return self.x - 40, self.y - 40 , self.x + 40 - 1, self.y + 40 -1
+
+    def sound(self):
+        self.spone_sound.play()
 
 class Goblin_babarian_UI:
     def __init__(self):
@@ -60,6 +70,8 @@ class Goblin_babarian_UI:
         self.x = start
         self.y = 540
         self.dir = 1
+        self.spone_sound = load_wav('resources/sound/babarian_gob_spone.wav')
+        self.spone_sound.set_volume(64)
 
     def update(self):
         self.x += self.dir
@@ -70,6 +82,9 @@ class Goblin_babarian_UI:
 
     def get_bb(self):
         return self.x - 40, self.y - 40 , self.x + 40 - 1, self.y + 40 -1
+
+    def sound(self):
+        self.spone_sound.play()
 
 class UI_Case:
     def __init__(self):

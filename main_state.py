@@ -31,7 +31,7 @@ from Minions import Goblin_Babarian
 from Minions import Dwarf_worrior
 from Minions import Dwarf_babarian
 
-from Catulpult_main_char import Goblin_Doom_catulpult
+from Catulpult_main_char import Goblin_WAR_machine
 
 current_path = os.getcwd()
 
@@ -55,11 +55,13 @@ UI_count = 0
 game_run_time = 0
 count = 0
 font = None
+tempUI = None
+temp_time = 0
 
 # army
 spawn_count = 0
 goblins = []
-catulpult = None
+GoblinWarMachine_GWM = None
 
 # enemy
 E_spawn_count = 0
@@ -103,24 +105,24 @@ def enter():
     ground = Ground()
     game_world.add_object(ground, 0)
 
-    global catulpult
-    catulpult = Goblin_Doom_catulpult()
-    game_world.add_object(catulpult, 1)
+    global GoblinWarMachine_GWM
+    GoblinWarMachine_GWM = Goblin_WAR_machine()
+    game_world.add_object(GoblinWarMachine_GWM, 1)
 
-    ground.set_center_object(catulpult)
-    background.set_center_object(catulpult)
-    ground.set_center_object(catulpult)
-    catulpult.set_background(background)
+    ground.set_center_object(GoblinWarMachine_GWM)
+    background.set_center_object(GoblinWarMachine_GWM)
+    ground.set_center_object(GoblinWarMachine_GWM)
+    GoblinWarMachine_GWM.set_background(background)
 
     global castle
     castle = Castle()
     game_world.add_object(castle, 2)
-    castle.set_center_object(catulpult)
+    castle.set_center_object(GoblinWarMachine_GWM)
 
     global frontground
     frontground = Frontground()
     game_world.add_object(frontground, 2)
-    frontground.set_center_object(catulpult)
+    frontground.set_center_object(GoblinWarMachine_GWM)
 
     global UIC
     UIC = UI_Case()
@@ -168,24 +170,25 @@ def handle_events():
         elif event.type == SDL_MOUSEBUTTONUP:
             mouse_pressed = False
 
+
         elif event.type == SDL_MOUSEMOTION:
             mouse.x = event.x
             mouse.y = 600 - event.y +1
         else:
-            catulpult.handle_event(event)
+            GoblinWarMachine_GWM.handle_event(event)
 
 
 def update():
-    global game_run_time, E_spawn_count, spawn_count, UI_count, mouse_coll, mouse_pressed, goblins
+    global game_run_time, E_spawn_count, spawn_count, UI_count, mouse_coll, mouse_pressed, goblins, tempUI, temp_time
     game_run_time += 1
 
-    if game_run_time % 5000 == 0:
+    if game_run_time % 600 == 0:
         if random.randint(0, 100) <= 50:
             enemys.append(Dwarf_worrior())
         else:
             enemys.append(Dwarf_babarian())
         game_world.add_object(enemys[E_spawn_count], 1)
-        enemys[E_spawn_count].set_center_object(catulpult)
+        enemys[E_spawn_count].set_center_object(GoblinWarMachine_GWM)
         E_spawn_count += 1
 
     if game_run_time % 300 == 0:
@@ -230,21 +233,21 @@ def update():
                 game_framework.push_state(game_clear_state)
 
 
-    if collide(catulpult, castle):
-        catulpult.x -= 5
+    if collide(GoblinWarMachine_GWM, castle):
+        GoblinWarMachine_GWM.x -= 5
 
     for enemy in enemys:
-        if collide(catulpult, enemy):
+        if collide(GoblinWarMachine_GWM, enemy):
 
             if game_run_time % 20 == 0:
-                catulpult.Health_point -= enemy.AP
-                if catulpult.x_velocity != 0:
-                    enemy.Health_point -= catulpult.AP
+                GoblinWarMachine_GWM.Health_point -= enemy.AP
+                if GoblinWarMachine_GWM.x_velocity != 0:
+                    enemy.Health_point -= GoblinWarMachine_GWM.AP
             enemy.x += 2
 
             if enemy.Health_point <= 0:
                 game_world.remove_object(enemy)
-            if catulpult.Health_point <= 0:
+            if GoblinWarMachine_GWM.Health_point <= 0:
                 game_framework.push_state(game_over_state)
 
 
@@ -267,31 +270,34 @@ def update():
                 if UIa.type == GOBLIN_KNGIHT:
                     goblins.append(Goblin_Knight())
                     game_world.add_object(goblins[spawn_count], 1)
-                    goblins[spawn_count].set_center_object(catulpult)
+                    goblins[spawn_count].set_center_object(GoblinWarMachine_GWM)
                 elif UIa.type == GOBLIN_SPEAR:
                     goblins.append(Goblin_Spear())
                     game_world.add_object(goblins[spawn_count], 1)
-                    goblins[spawn_count].set_center_object(catulpult)
+                    goblins[spawn_count].set_center_object(GoblinWarMachine_GWM)
                 elif UIa.type == GOBLIN_BABARIAN:
                     goblins.append(Goblin_Babarian())
                     game_world.add_object(goblins[spawn_count], 1)
-                    goblins[spawn_count].set_center_object(catulpult)
+                    goblins[spawn_count].set_center_object(GoblinWarMachine_GWM)
                 spawn_count += 1
+                tempUI = UIa
+                temp_time = 2000
                 UIs.remove(UIa)
                 game_world.remove_object(UIa)
                 for UIb in UIs:
                     UIb.dir = 1
                 UI_count -= 1
 
+    if tempUI != None and temp_time >= 2000:
+        tempUI.sound()
+        temp_time -= 1
+
 
     for UIa in UIs:
         if collide(UIa, UIC):
             UIa.dir = 0
 
-
-
     delay(0.01)
-
 
 def draw():
     clear_canvas()

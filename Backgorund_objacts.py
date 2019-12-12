@@ -34,6 +34,9 @@ class Background:
         self.w = self.image.w
         self.h = self.image.h
         self.y = 300
+        self.bgm= load_music('resources/sound/Total War Warhammer [OST] Greenskin Skirmish 2.mp3')
+        self.bgm.set_volume(32)
+        self.bgm.repeat_play()
 
     def set_center_object(self, catulpult):
         self.center_object = catulpult
@@ -73,7 +76,7 @@ class Castle:
     def __init__(self):
         self.HPimage0 = load_image('resources/images/UI/C_HP_0.png')
         self.HPimage1 = load_image('resources/images/UI/C_HP_1.png')
-        self.Max_HP = 50000
+        self.Max_HP = 5000
         self.Health_Point = self.Max_HP
         self.image = load_image('resources/images/background/Dwarf_Castle.png')
         self.canvas_width = get_canvas_width()

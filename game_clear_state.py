@@ -16,7 +16,7 @@ def enter():
     global  image, point_image, point
     image =load_image('resources/images/UI/Game_clear.png')
 
-    if main_state.catulpult.Health_point < main_state.catulpult.Max_HP//2:
+    if main_state.GoblinWarMachine_GWM.Health_point < main_state.GoblinWarMachine_GWM.Max_HP//2:
         point -= 1
     if main_state.game_run_time > 360000:
         point -= 1

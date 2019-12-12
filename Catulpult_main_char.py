@@ -26,61 +26,63 @@ key_event_table = {
 class IdleState:
 
     @staticmethod
-    def enter(Goblin_Doom_catulpult, event):
+    def enter(Goblin_WAR_machine, event):
         if event == RIGHT_DOWN:
-            Goblin_Doom_catulpult.x_velocity += RUN_SPEED_PPS
+            Goblin_WAR_machine.x_velocity += RUN_SPEED_PPS
         elif event == LEFT_DOWN:
-            Goblin_Doom_catulpult.x_velocity -= RUN_SPEED_PPS
+            Goblin_WAR_machine.x_velocity -= RUN_SPEED_PPS
         elif event == RIGHT_UP:
-            Goblin_Doom_catulpult.x_velocity -= RUN_SPEED_PPS
+            Goblin_WAR_machine.x_velocity -= RUN_SPEED_PPS
         elif event == LEFT_UP:
-            Goblin_Doom_catulpult.x_velocity += RUN_SPEED_PPS
+            Goblin_WAR_machine.x_velocity += RUN_SPEED_PPS
 
     @staticmethod
-    def exit(Goblin_Doom_catulpult, event):
+    def exit(Goblin_WAR_machine, event):
         pass
 
     @staticmethod
-    def do(Goblin_Doom_catulpult):
+    def do(Goblin_WAR_machine):
         pass
 
     @staticmethod
-    def draw(Goblin_Doom_catulpult):
-        cx = Goblin_Doom_catulpult.x - Goblin_Doom_catulpult.bg.window_left
-        Goblin_Doom_catulpult.image.clip_draw(int(Goblin_Doom_catulpult.frame) * Goblin_Doom_catulpult.w, 0, Goblin_Doom_catulpult.w, Goblin_Doom_catulpult.h, cx,Goblin_Doom_catulpult.y)
+    def draw(Goblin_WAR_machine):
+        cx = Goblin_WAR_machine.x - Goblin_WAR_machine.bg.window_left
+        Goblin_WAR_machine.image.clip_draw(int(Goblin_WAR_machine.frame) * Goblin_WAR_machine.w, 0, Goblin_WAR_machine.w, Goblin_WAR_machine.h, cx, Goblin_WAR_machine.y)
 
 
 class MoveState:
 
     @staticmethod
-    def enter(Goblin_Doom_catulpult, event):
+    def enter(Goblin_WAR_machine, event):
         if event == RIGHT_DOWN:
-            Goblin_Doom_catulpult.x_velocity += RUN_SPEED_PPS
+            Goblin_WAR_machine.x_velocity += RUN_SPEED_PPS
         elif event == LEFT_DOWN:
-            Goblin_Doom_catulpult.x_velocity -= RUN_SPEED_PPS
+            Goblin_WAR_machine.x_velocity -= RUN_SPEED_PPS
         elif event == RIGHT_UP:
-            Goblin_Doom_catulpult.x_velocity -= RUN_SPEED_PPS
+            Goblin_WAR_machine.x_velocity -= RUN_SPEED_PPS
         elif event == LEFT_UP:
-            Goblin_Doom_catulpult.x_velocity += RUN_SPEED_PPS
-        Goblin_Doom_catulpult.dir = clamp(-1, Goblin_Doom_catulpult.x_velocity, 1)
+            Goblin_WAR_machine.x_velocity += RUN_SPEED_PPS
+        Goblin_WAR_machine.dir = clamp(-1, Goblin_WAR_machine.x_velocity, 1)
 
     @staticmethod
-    def exit(Goblin_Doom_catulpult, event):
+    def exit(Goblin_WAR_machine, event):
         pass
 
     @staticmethod
-    def do(Goblin_Doom_catulpult):
-        Goblin_Doom_catulpult.frame = (Goblin_Doom_catulpult.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % FRAMES_PER_ACTION
-        Goblin_Doom_catulpult.x += Goblin_Doom_catulpult.x_velocity * game_framework.frame_time
-        Goblin_Doom_catulpult.x = clamp(0, Goblin_Doom_catulpult.x, Goblin_Doom_catulpult.bg.w)
+    def do(Goblin_WAR_machine):
+        Goblin_WAR_machine.frame = (Goblin_WAR_machine.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % FRAMES_PER_ACTION
+        Goblin_WAR_machine.x += Goblin_WAR_machine.x_velocity * game_framework.frame_time
+        Goblin_WAR_machine.x = clamp(0, Goblin_WAR_machine.x, Goblin_WAR_machine.bg.w)
 
     @staticmethod
-    def draw(Goblin_Doom_catulpult):
-        cx = Goblin_Doom_catulpult.x - Goblin_Doom_catulpult.bg.window_left
-        if Goblin_Doom_catulpult.dir == 1:
-            Goblin_Doom_catulpult.image.clip_draw(int(Goblin_Doom_catulpult.frame) * Goblin_Doom_catulpult.w, Goblin_Doom_catulpult.h * 1, Goblin_Doom_catulpult.w, Goblin_Doom_catulpult.h ,  cx, Goblin_Doom_catulpult.y)
+    def draw(Goblin_WAR_machine):
+        cx = Goblin_WAR_machine.x - Goblin_WAR_machine.bg.window_left
+        if Goblin_WAR_machine.dir == 1:
+            Goblin_WAR_machine.image.clip_draw(int(Goblin_WAR_machine.frame) * Goblin_WAR_machine.w, Goblin_WAR_machine.h * 1, Goblin_WAR_machine.w, Goblin_WAR_machine.h, cx, Goblin_WAR_machine.y)
         else:
-            Goblin_Doom_catulpult.image.clip_draw(int(Goblin_Doom_catulpult.frame) * Goblin_Doom_catulpult.w, Goblin_Doom_catulpult.h * 0, Goblin_Doom_catulpult.w, Goblin_Doom_catulpult.h , cx, Goblin_Doom_catulpult.y)
+            Goblin_WAR_machine.image.clip_draw(int(Goblin_WAR_machine.frame) * Goblin_WAR_machine.w, Goblin_WAR_machine.h * 0, Goblin_WAR_machine.w, Goblin_WAR_machine.h, cx, Goblin_WAR_machine.y)
+
+
 
 next_state_table = {
     IdleState: {RIGHT_UP: MoveState, LEFT_UP: MoveState, RIGHT_DOWN: MoveState, LEFT_DOWN: MoveState},
@@ -89,15 +91,15 @@ next_state_table = {
 }
 
 
-class Goblin_Doom_catulpult:
+class Goblin_WAR_machine:
 
     def __init__(self):
         self.HPimage0 = load_image('resources/images/UI/GDC_HP_0.png')
         self.HPimage1 = load_image('resources/images/UI/GDC_HP_1.png')
-        self.Max_HP = 3000
+        self.Max_HP = 1000
         self.Health_point = self.Max_HP
         self.x, self.y = 100, 100
-        self.AP = 400
+        self.AP = 70
         self.canvas_width = get_canvas_width()
         self.canvas_height = get_canvas_height()
         self.image = load_image("resources/images/Goblins/Goblin_Doom_wheel.png")

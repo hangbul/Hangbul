@@ -12,7 +12,7 @@ RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 # Minion Action Speed
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-FRAMES_PER_ACTION = 8
+FRAMES_PER_ACTION = 40
 
 # Minion Type
 GOBLIN_KNGIHT, GOBLIN_SPEAR, GOBLIN_BABARIAN, DWARF_WORRIR, DWARF_BABARIAN = range(5)
@@ -106,13 +106,20 @@ class AttackState:
             90 * (1 - (minion.Health_point / minion.Max_HP))) // 2 - minion.window_left + minion.x, 50 + minion.y)
         minion.image.clip_draw(int(minion.frame) * minion.w, 0, minion.w, minion.h, 0 - minion.window_left + minion.x,
                                0 + minion.y)
-        if minion.type == GOBLIN_SPEAR and int(minion.frame) == 15:
+        if minion.type == GOBLIN_KNGIHT and int(minion.frame) == 15:
+            minion.attack_sound.play()
+        elif minion.type == GOBLIN_BABARIAN and int(minion.frame) == 20:
+            minion.attack_sound.play()
+            delay(0.01)
+            minion.attack_sound.play()
+        elif minion.type == GOBLIN_SPEAR and int(minion.frame) == 15:
             minion.attack_sound.play()
         elif minion.type == DWARF_WORRIR and int(minion.frame) == 20:
             minion.attack_sound.play()
         elif minion.type == DWARF_BABARIAN and int(minion.frame) == 20:
             minion.attack_sound.play()
-
+            delay(0.01)
+            minion.attack_sound.play()
 
 next_state_table = {
     IdleState: {ATTACK_TIME: AttackState},
@@ -128,11 +135,11 @@ class Goblin_Knight:
         self.HPimage1 = load_image('resources/images/UI/HP_1.png')
 
         self.type = GOBLIN_KNGIHT
-        self.DF = 80
-        self.AP = 80
-        self.Max_HP = 1000
+        self.DF = 30
+        self.AP = 30
+        self.Max_HP = 120
         self.Health_point = self.Max_HP
-        self.x, self.y = - 20, 90
+        self.x, self.y = - 50, 90
         self.window_left = 0
         self.window_bottom = 0
         if Goblin_Knight.image == None:
@@ -150,7 +157,7 @@ class Goblin_Knight:
         self.w
         self.h
         self.enemy = None
-        self.attack_sound = load_wav('resources/sound/spear_gob.wav')
+        self.attack_sound = load_wav('resources/sound/sword_gob.wav')
         self.attack_sound.set_volume(32)
 
 
@@ -214,10 +221,10 @@ class Goblin_Spear:
         self.HPimage1 = load_image('resources/images/UI/HP_1.png')
         self.type = GOBLIN_SPEAR
         self.DF = 15
-        self.AP = 5
-        self.Max_HP = 90
+        self.AP = 20
+        self.Max_HP = 100
         self.Health_point = self.Max_HP
-        self.x, self.y = - 20, 90
+        self.x, self.y = - 50, 90
         self.window_left = 0
         self.window_bottom = 0
         # Boy is only once created, so instance image loading is fine
@@ -300,11 +307,11 @@ class Goblin_Babarian:
         self.HPimage1 = load_image('resources/images/UI/HP_1.png')
 
         self.type = GOBLIN_BABARIAN
-        self.DF = 30
-        self.AP = 150
-        self.Max_HP = 1300
+        self.DF = 8
+        self.AP = 40
+        self.Max_HP = 130
         self.Health_point = self.Max_HP
-        self.x, self.y = - 20, 90
+        self.x, self.y = - 50, 90
         self.window_left = 0
         self.window_bottom = 0
         # Boy is only once created, so instance image loading is fine
@@ -323,7 +330,7 @@ class Goblin_Babarian:
         self.w
         self.h
         self.enemy = None
-        self.attack_sound = load_wav('resources/sound/spear_gob.wav')
+        self.attack_sound = load_wav('resources/sound/sword_gob.wav')
         self.attack_sound.set_volume(32)
 
 
@@ -387,9 +394,9 @@ class Dwarf_worrior:
         self.HPimage1 = load_image('resources/images/UI/HP_1.png')
 
         self.type = DWARF_BABARIAN
-        self.DF = 50
-        self.AP = 100
-        self.Max_HP = 1500
+        self.DF = 10
+        self.AP = 20
+        self.Max_HP = 150
         self.Health_point = self.Max_HP
         self.x, self.y = 1500, 90
         self.window_left = 0
@@ -473,8 +480,8 @@ class Dwarf_babarian:
 
         self.type = DWARF_WORRIR
         self.DF = 10
-        self.AP = 150
-        self.Max_HP = 1600
+        self.AP = 50
+        self.Max_HP = 160
         self.Health_point = self.Max_HP
         self.x, self.y = 1500, 90
         self.window_left = 0
