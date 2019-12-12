@@ -101,7 +101,7 @@ class Goblin_Doom_catulpult:
         self.canvas_width = get_canvas_width()
         self.canvas_height = get_canvas_height()
         self.image = load_image("resources/images/Goblins/Goblin_Doom_wheel.png")
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('resources/font/ENCR10B.TTF', 16)
         self.w = self.image.w // 60
         self.h = self.image.h // 2
         self.dir = 1

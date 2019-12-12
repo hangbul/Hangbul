@@ -106,6 +106,12 @@ class AttackState:
             90 * (1 - (minion.Health_point / minion.Max_HP))) // 2 - minion.window_left + minion.x, 50 + minion.y)
         minion.image.clip_draw(int(minion.frame) * minion.w, 0, minion.w, minion.h, 0 - minion.window_left + minion.x,
                                0 + minion.y)
+        if minion.type == GOBLIN_SPEAR and int(minion.frame) == 15:
+            minion.attack_sound.play()
+        elif minion.type == DWARF_WORRIR and int(minion.frame) == 20:
+            minion.attack_sound.play()
+        elif minion.type == DWARF_BABARIAN and int(minion.frame) == 20:
+            minion.attack_sound.play()
 
 
 next_state_table = {
@@ -131,7 +137,7 @@ class Goblin_Knight:
         self.window_bottom = 0
         if Goblin_Knight.image == None:
             Goblin_Knight.image = load_image('resources/images/Goblins/GK_walk.png')
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('resources/font/ENCR10B.TTF', 16)
         self.dir = 1
         self.velocity = 0
         self.frame = 0
@@ -144,6 +150,10 @@ class Goblin_Knight:
         self.w
         self.h
         self.enemy = None
+        self.attack_sound = load_wav('resources/sound/spear_gob.wav')
+        self.attack_sound.set_volume(32)
+
+
 
     def get_bb(self):
         # return self.x - 15, self.y - 35, self.x + 40, self.y + 50
@@ -213,7 +223,7 @@ class Goblin_Spear:
         # Boy is only once created, so instance image loading is fine
         if Goblin_Spear.image == None:
             Goblin_Spear.image = load_image('resources/images/Goblins/GS_walk.png')
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('resources/font/ENCR10B.TTF', 16)
         self.dir = 1
         self.velocity = 0
         self.frame = 0
@@ -226,6 +236,8 @@ class Goblin_Spear:
         self.w
         self.h
         self.enemy = None
+        self.attack_sound = load_wav('resources/sound/spear_gob.wav')
+        self.attack_sound.set_volume(32)
 
     def get_bb(self):
         # return self.x - 15, self.y - 35, self.x + 40, self.y + 50
@@ -298,7 +310,7 @@ class Goblin_Babarian:
         # Boy is only once created, so instance image loading is fine
         if Goblin_Babarian.image == None:
             Goblin_Babarian.image = load_image('resources/images/Goblins/GB_walk.png')
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('resources/font/ENCR10B.TTF', 16)
         self.dir = 1
         self.velocity = 0
         self.frame = 0
@@ -311,6 +323,9 @@ class Goblin_Babarian:
         self.w
         self.h
         self.enemy = None
+        self.attack_sound = load_wav('resources/sound/spear_gob.wav')
+        self.attack_sound.set_volume(32)
+
 
     def get_bb(self):
         # return self.x - 15, self.y - 35, self.x + 40, self.y + 50
@@ -383,7 +398,7 @@ class Dwarf_worrior:
         # self.image = load_image('resources/images/Gk_walk/GK_walk.png')
         if Dwarf_worrior == None:
             Dwarf_worrior.image = load_image('resources/images/Dwarfs/DW_walk.png')
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('resources/font/ENCR10B.TTF', 16)
         self.dir = -1
         self.velocity = 0
         self.frame = 0
@@ -396,6 +411,9 @@ class Dwarf_worrior:
         self.w
         self.h
         self.enemy = None
+        self.attack_sound = load_wav('resources/sound/axe_worrior.wav')
+        self.attack_sound.set_volume(32)
+
 
     def get_bb(self):
         # return self.x - 15, self.y - 35, self.x + 40, self.y + 50
@@ -465,7 +483,7 @@ class Dwarf_babarian:
         # self.image = load_image('resources/images/Gk_walk/GK_walk.png')
         if Dwarf_babarian.image == None:
             Dwarf_babarian.image = load_image('resources/images/Dwarfs/DB_walk.png')
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('resources/font/ENCR10B.TTF', 16)
         self.dir = -1
         self.velocity = 0
         self.frame = 0
@@ -478,6 +496,9 @@ class Dwarf_babarian:
         self.w
         self.h
         self.enemy = None
+        self.attack_sound = load_wav('resources/sound/axe_babarian.wav')
+        self.attack_sound.set_volume(32)
+
 
     def get_bb(self):
         # return self.x - 15, self.y - 35, self.x + 40, self.y + 50

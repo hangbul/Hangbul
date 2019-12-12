@@ -82,7 +82,7 @@ class Castle:
         self.h = self.image.h
         self.x = 1600
         self.y = 240
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('resources/font/ENCR10B.TTF', 16)
 
     def get_bb(self):
         return -self.w//2 - self.window_left + self.x, -self.h//2 + self.y, self.w//2 - self.window_left + self.x, self.h//2 + self.y

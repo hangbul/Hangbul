@@ -8,7 +8,9 @@ import game_framework
 import game_world
 import pause_state
 import title_state
-
+import menu_state
+import game_over_state
+import game_clear_state
 
 from Backgorund_objacts import Ground
 from Backgorund_objacts import Background
@@ -19,6 +21,8 @@ from UI_s import Goblin_knight_UI
 from UI_s import Goblin_spear_UI
 from UI_s import Goblin_babarian_UI
 from UI_s import UI_Case
+from UI_s import pause_UI
+from UI_s import question_UI
 from UI_s import Mouse_UI
 
 from Minions import Goblin_Knight
@@ -39,15 +43,18 @@ background = None
 ground = None
 
 #UI
-GOBLIN_KNGIHT, GOBLIN_SPEAR, GOBLIN_BABARIAN = range(3)
+GOBLIN_KNGIHT, GOBLIN_SPEAR, GOBLIN_BABARIAN, NOTMIN1, NOTMIN2 = range(5)
+
 UIs = []
 temp = 0
+UIm = []
 UIC = None
 mouse = None
 mouse_coll = False
 UI_count = 0
 game_run_time = 0
 count = 0
+font = None
 
 # army
 spawn_count = 0
@@ -85,6 +92,9 @@ def collide(a, b):
 
 
 def enter():
+    global font
+    font = load_font('resources/font/MoriaCitadel.TTF', 16)
+
     global background
     background = Background()
     game_world.add_object(background, 0)
@@ -116,6 +126,11 @@ def enter():
     UIC = UI_Case()
     game_world.add_object(UIC, 2)
 
+    global UIm
+    UIm = [question_UI(), pause_UI()]
+    for UI in UIm:
+        game_world.add_object(UI, 2)
+
     global mouse
     mouse = Mouse_UI()
 
@@ -144,6 +159,9 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_p:
             game_framework.push_state(pause_state)
 
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_q:
+            game_framework.push_state(menu_state)
+
         elif event.type == SDL_MOUSEBUTTONDOWN:
             mouse_pressed = True
 
@@ -161,7 +179,7 @@ def update():
     global game_run_time, E_spawn_count, spawn_count, UI_count, mouse_coll, mouse_pressed, goblins
     game_run_time += 1
 
-    if game_run_time % 700 == 0:
+    if game_run_time % 5000 == 0:
         if random.randint(0, 100) <= 50:
             enemys.append(Dwarf_worrior())
         else:
@@ -203,10 +221,14 @@ def update():
                         goblin.dead()
                         enemy_q.kill()
                         game_world.remove_object(goblin)
+
         if collide(goblin, castle):
             goblin.attack()
             if 15 < goblin.frame <= 15.5:
                 castle.Health_Point -= goblin.AP
+            if castle.Health_Point <= 0:
+                game_framework.push_state(game_clear_state)
+
 
     if collide(catulpult, castle):
         catulpult.x -= 5
@@ -214,16 +236,26 @@ def update():
     for enemy in enemys:
         if collide(catulpult, enemy):
 
-            if catulpult.x_velocity != 0 and game_run_time % 20 == 0:
-                enemy.Health_point -= catulpult.AP
+            if game_run_time % 20 == 0:
                 catulpult.Health_point -= enemy.AP
+                if catulpult.x_velocity != 0:
+                    enemy.Health_point -= catulpult.AP
             enemy.x += 2
 
             if enemy.Health_point <= 0:
                 game_world.remove_object(enemy)
             if catulpult.Health_point <= 0:
-                # game_framework.change_state(game_over_state)
-                pass
+                game_framework.push_state(game_over_state)
+
+
+    for UIi in UIm:
+        if collide(UIi, mouse):
+            if mouse_pressed == True:
+                if UIi.type == NOTMIN1:
+                    game_framework.push_state(pause_state)
+                elif UIi.type == NOTMIN2:
+                    game_framework.push_state(menu_state)
+                mouse_pressed = False
 
     for UIa in UIs:
         for UIb in UIs:
@@ -266,6 +298,7 @@ def draw():
     for game_object in game_world.all_objects():
         game_object.draw()
 
+    font.draw(get_canvas_width() - 90 , 540,'%0d : %0d' % ((game_run_time/100)/60, (game_run_time/100)%60), (255, 255, 255))
     mouse.draw()
 
     update_canvas()
